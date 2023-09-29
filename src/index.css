@@ -1,13 +1,507 @@
+@font-face {
+  font-family: DoDavidRegular;
+  src: url(./fonts/DoDavidGothicRegular.ttf);
+}
+
+@font-face {
+  font-family: Hilda;
+  src: url(./fonts/HildaSonnenschein.ttf);
+}
+
+@font-face {
+  font-family: Frik;
+  src: url(./fonts/Frik.ttf);
+}
+
+:root {
+  --lightest: hsl(215, 89%, 100%);
+  --lighter: hsl(215, 89%, 80%);
+  --light: hsl(215, 89%, 70%);
+  --normal: hsl(215, 89%, 50%);
+  --dark: hsl(215, 89%, 14%);
+  --darker: hsl(215, 89%, 10%);
+  --darkest: hsl(215, 89%, 7%);
+  --highlight-light: hsl(359, 89%, 80%);
+  --highlight: hsl(359, 89%, 28%);
+  --highlight-dark: hsl(359, 89%, 14%);
+  --highlight-darkest: hsl(359, 89%, 7%);
+  --complement-light: hsl(71, 89%, 42%);
+  --complement: hsl(71, 89%, 14%);
+  --complement-dark: hsl(71, 89%, 7%);
+}
+html,
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  margin: 0px;
+  font-family: Frik, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding: 0px;
+  background-color: #f5f5f5;
+}
+
+p {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+li {
+  list-style-type: none;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0px;
+  padding: 0px;
+}
+p,
+ul,
+li {
+  margin: 0px;
+  padding: 0px;
+}
+
+html {
+  font-size: 16px;
+}
+
+.app {
+  width: 100%;
+  margin: 0 auto;
+  position: absolute;
+}
+
+@keyframes header-move {
+  from {
+    top: calc(-1 * (16px + 3vw));
+  }
+
+  to {
+    top: 0;
+  }
+}
+
+header {
+  background-color: var(--dark);
+  padding: 0px;
+  height: 100px;
+  color: var(--lightest);
+}
+
+nav .icon {
+  display: none;
+}
+
+nav ul {
+  position: relative;
+  animation-name: header-move;
+  animation-duration: .8s;
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  padding: 0px;
+  align-items: center;
+}
+
+nav li {
+  padding: 12px;
+  margin: 16px;
+  border-radius: 10%;
+  font-size: 32px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+nav li:hover {
+  background-color: var(--lighter);
+}
+
+nav a {
+  color: var(--lightest);
+  text-decoration: none;
+}
+
+nav li p {
+  position: relative;
+}
+
+@media screen and (max-width: 600px) {
+  @keyframes header-open {
+    from {
+      height: 100px;
+    }
+
+    to {
+      height: 400px;
+    }
+  }
+
+  @keyframes header-close {
+    from {
+      height: 400px;
+    }
+
+    to {
+      height: 100px;
+    }
+  }
+
+  @keyframes links-open {
+    from {
+      top: -320px;
+    }
+
+    to {
+      top: 0px;
+    }
+  }
+
+  @keyframes links-close {
+    from {
+      top: 0px;
+      opacity: 1;
+    }
+
+    to {
+      top: -320px;
+      opacity: 0;
+    }
+  }
+
+  header.responsive {
+    animation-name: header-open;
+    animation-duration: 1s;
+    height: 400px;
+  }
+  header.opened:not(.responsive) {
+    animation-name: header-close;
+    animation-duration: 1s;
+  }
+  nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100px;
+  }
+  nav .icon {
+    float: right;
+    display: block;
+  }
+  nav a {
+    display: none;
+  }
+  nav ul.responsive {
+    animation-name: links-open;
+    animation-duration: 1s;
+    width: 100%;
+    height: 100%;
+    display: relative;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  nav ul.opened:not(.responsive) {
+    animation-name: links-close;
+    animation-duration: 1s;
+  }
+
+  nav ul.responsive a {
+    display: block;
+  }
+
+  nav ul.closing {
+    width: 100%;
+    height: 100%;
+    display: relative;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  nav ul.closing a {
+    display: block;
+  }
+}
+
+footer {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: var(--darkest);
+  color: white;
+  padding: 20px;
+}
+
+.home {
+  margin: 0px;
+  padding: 0px;
+}
+
+/* Home page styles */
+@keyframes hero-zoom-in {
+  0% {
+    background-size: 110%;
+  }
+  100% {
+    background-size: 100%;
+  }
+}
+
+.hero {
+  height: calc(90vh - 100px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  animation-name: hero-zoom-in;
+  animation-duration: 1s;
+  background-size: 100%;
+}
+.hero-text {
+  margin-left: calc(16px + 3vw);
+  width: 760px;
+  color: var(--lightest);
+  position: absolute;
+}
+
+.hero-right {
+  justify-content: flex-end;
+}
+
+.hero-text-right {
+  margin-right: calc(16px + 3vw);
+  text-align: right;
+}
+
+.dark {
+  color: var(--light);
+
+}
+
+@keyframes brand-move {
+  from {
+    left: calc(-1 * (16px + 3vw));
+  }
+
+  to {
+    left: 0;
+  }
+}
+
+@keyframes quote-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.hero-text h1 {
+  position: relative;
+  left: 0px;
+  font-size: 120px;
+  font-family: Frik;
+  margin-bottom: 16px;
+  animation-name: brand-move;
+  animation-duration: 1s;
+}
+.hero-text .quote {
+  width: calc(100%-96px);
+  text-align: right;
+  font-size: 48px;
+  margin-left: 48px;
+  margin-right: 48px;
+  animation-name: quote-fade;
+  animation-duration: 5s;
+}
+.hero-text .quote p {
+  font-family: Frik;
+}
+
+.indent-text {
+  margin-left: 32px;
+  margin-right: 32px;
+}
+
+.text-section {
+  padding: 200px 0px;
+  width: calc(100vw -17px);
+  margin: auto;
+  text-align: center;
+  font-size: 24px;
+  background-color: var(--dark);
+  color: var(--lightest)
+}
+
+.inner-section {
+  width: 80%;
+  margin: auto;
+}
+
+.side-by-side {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 80px 0px;
+}
+
+.card h3 {
+  margin-bottom: 10px;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  width: 300px;
+  height: 300px;
+  padding: 15px;
+  background-color: var(--normal);
+}
+
+.section-title {
+  padding: 20px;
+  text-align: center;
+}
+
+
+
+@media screen and (max-width: 890px) {
+  .hero {
+    padding-top: 80px;
+    align-items: flex-start;
+  }
+
+  .hero-text {
+    width: 600px;
+  }
+
+  .hero-text h1 {
+    font-size: 160px;
+  }
+  .hero-text .quote {
+    font-size: 32px;
+    width: calc(100%-96px);
+  }
+}
+
+@media screen and (max-width: 652px) {
+  .hero-text {
+    width: 500px;
+  }
+  .hero-text h1 {
+    font-size: 136px;
+  }
+  .hero-text .quote {
+    font-size: 27px;
+  }
+}
+
+@media screen and (max-width: 602px) {
+  .hero {
+    margin: 0px;
+    justify-content: center;
+  }
+  .hero-text {
+    width: 100%;
+    margin: 5px;
+  }
+  .hero-text h1 {
+    margin-left: 20px;
+  }
+}
+
+@media screen and (max-width: 490px) {
+  .hero {
+    background-position: 800px -120px;
+    height: 700px;
+  }
+  .hero-text h1 {
+    font-size: 96px;
+  }
+  .hero-text .quote {
+    font-size: 19px;
+  }
+  .indent-text {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+}
+
+/* Services page styles */
+.services h2 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+.service {
+  margin-bottom: 30px;
+}
+
+.icon {
+  font-size: 32px;
+  margin-right: 10px;
+}
+
+/* Contact page styles */
+.contact h2 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+/* AboutUs.css */
+
+.about-us {
+  padding: 40px;
+  background-color: #f8f8f8;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-content h2 {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.about-content p {
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.progressbar li{
+  position:relative; 
+}
+
+.progressbar li:after {
+  /* CSS for creating horizontal line*/
+  content:'';
+  position: absolute; 
+  width:calc(7vw - 8px);
+  height:2px;
+  background-color: black;
+  top: 8vw; 
+  left: calc(-7vw + 4px); 
+}
+.progressbar li:first-child:after {
+  content:none;
+}
+
+.row{
+  display: flex;
 }
