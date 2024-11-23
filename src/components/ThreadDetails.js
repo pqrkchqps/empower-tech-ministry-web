@@ -69,6 +69,14 @@ const ThreadDetails = () => {
   const [newComment, setNewComment] = useState("");
   const [rootThread, setRootThread] = useState(thread);
   const [replyingTo, setReplyingTo] = useState(null);
+  const [editingTo, setEditingTo] = useState(null);
+  const [isDisabledPostReply, setIsDisabledPostReply] = useState(false);
+  const [isDisabledDeleteComment, setIsDisabledDeleteComment] = useState(false);
+  const [isDisabledEditComment, setIsDisabledEditComment] = useState(false);
+  const [isEditAlreadyUpdated, setIsEditAlreadyUpdated] = useState(false);
+  const [isEditTitleAlreadyUpdated, setIsEditTitleAlreadyUpdated] =
+  useState(false);
+  const [editThreadTitle, setEditThreadTitle] = useState(false);
 
   useEffect(() => {
     if (!thread || !thread.id) {
@@ -82,33 +90,206 @@ const ThreadDetails = () => {
     });
   }, []);
 
-  const handleAddComment = async () => {
-    if (newComment.trim() === "") {
-      return;
+  
+  function updateRootThread(thread) {
+    if (rootThread) {
+      rootThread.title = editThreadTitle;
+      rootThread.content = editCommentText;
+      let newRootThread = JSON.parse(JSON.stringify(rootThread));
+      setRootThread(newRootThread);
     }
+  }
+  
+  function updateCommentToRootThread(comment) {
+    if (rootThread) {
+      if (newComment.parentid == -1) {
+        rootThread.children.push(newComment);
+      } else {
+        let chs = rootThread.children;
+        console.log('chs', chs);
+        let queue = [...rootThread.children];
+        while (queue.length > 0) {
+          let currentComment = queue.shift();
+          if (currentComment) {
+            if (currentComment.id == comment.id) {
+              currentComment.content = comment.content;
+              break;
+            } else {
+              currentComment.children.map(comment => {
+                queue.push(comment);
+              });
+            }
+          }
+        }
+      }
+      let newRootThread = JSON.parse(JSON.stringify(rootThread));
+      setRootThread(newRootThread);
+    }
+  }
 
-    const comment = {
-      content: newComment,
-      rootid: rootThread.id,
-      parentid: replyingTo !== null ? replyingTo : -1,
-    };
-    await axios.post(
-      process.env.REACT_APP_API_URL + "/api/comment/thread",
-      comment
-    );
-    const response = await axios.get(
-      process.env.REACT_APP_API_URL + "/api/thread/" + thread.id
-    );
+  function updateRootThread(thread) {
+    if (rootThread) {
+      rootThread.title = editThreadTitle;
+      rootThread.content = editCommentText;
+      let newRootThread = JSON.parse(JSON.stringify(rootThread));
+      setRootThread(newRootThread);
+    }
+  }
 
-    setRootThread(response.data.thread);
-    setReplyingTo(null);
+  const handleAddComment = async () => {
+    if (!isDisabledPostReply) {
+      if (newComment.trim() === "") {
+        return;
+      }
 
-    setNewComment("");
+      const comment = {
+        content: newComment,
+        rootid: rootThread.id,
+        parentid: replyingTo !== null ? replyingTo : -1,
+      };
+
+      setIsDisabledPostReply(true);
+      await axios.post(
+        process.env.REACT_APP_API_URL + "/api/comment/thread",
+        comment
+      );
+      const response = await axios.get(
+        process.env.REACT_APP_API_URL + "/api/thread/" + thread.id
+      );
+      setIsDisabledPostReply(false);
+
+      setRootThread(response.data.thread);
+      setReplyingTo(null);
+
+      setNewComment("");
+    }
   };
+
+  function deleteCommentToRootThread(comment) {
+    if (rootThread) {
+      if (newComment.parentid == -1) {
+        rootThread.children.push(newComment);
+      } else {
+        let chs = rootThread.children;
+        console.log("chs", chs);
+        let queue = [...rootThread.children];
+        while (queue.length > 0) {
+          let currentComment = queue.shift();
+          if (currentComment) {
+            if (currentComment.id == comment.id) {
+              currentComment.content = "deleted";
+              break;
+            } else {
+              currentComment.children.map((comment) => {
+                queue.push(comment);
+              });
+            }
+          }
+        }
+      }
+      let newRootThread = JSON.parse(JSON.stringify(rootThread));
+      setRootThread(newRootThread);
+    }
+  }
+
+  const handleCancelReply = async () => {
+    if (!isDisabledPostReply) {
+      setReplyingTo(null);
+
+      setNewComment("");
+    }
+  };
+
+  const handleSubmitEditComment = async () => {
+    if (!isDisabledEditComment) {
+      const comment = {
+        content: editCommentText,
+        id: editingTo,
+      };
+      if (comment.content.trim() === "") {
+        return;
+      }
+      setIsDisabledEditComment(true);
+      await axios.patch(API_URL + "/api/comment/thread/" + editingTo, comment);
+      updateCommentToRootThread(comment);
+      setIsDisabledEditComment(false);
+
+      setEditingTo(null);
+
+      setEditCommentText("");
+
+      setIsEditAlreadyUpdated(false);
+    }
+  };
+
+  const handleCancelEditComment = async () => {
+    if (!isDisabledEditComment) {
+      setEditingTo(null);
+
+      setEditCommentText("");
+      setEditThreadTitle("");
+
+      setIsEditAlreadyUpdated(false);
+      setIsEditTitleAlreadyUpdated(false);
+    }
+  };
+
+  const handleSubmitEditThread = async () => {
+    if (!isDisabledEditComment) {
+      const thread = {
+        title: editThreadTitle,
+        content: editCommentText,
+        id: rootThread.id,
+      };
+      if (thread.title.trim() === "") {
+        return;
+      }
+      setIsDisabledEditComment(true);
+      await axios.patch(API_URL + "/api/thread/" + rootThread.id, thread);
+      updateRootThread(thread);
+      setIsDisabledEditComment(false);
+
+      setEditingTo(null);
+
+      setEditCommentText("");
+      setEditThreadTitle("");
+
+      setIsEditAlreadyUpdated(false);
+      setIsEditTitleAlreadyUpdated(false);
+    }
+  };
+
+  function setOnceEditCommentText(text) {
+    if (!isEditAlreadyUpdated) {
+      setEditCommentText(text);
+      setIsEditAlreadyUpdated(true);
+    }
+    return true;
+  }
+
+  function setOnceEdiThreadTitle(text) {
+    if (!isEditTitleAlreadyUpdated) {
+      setEditThreadTitle(text);
+      setIsEditTitleAlreadyUpdated(true);
+    }
+    return true;
+  }
 
   const renderItem = ({ item }) => (
     <CommentContainer key={item.id}>
-      <CommentText>{item.content}</CommentText>
+      <CommentText>
+        {editingTo === item.id && setOnceEditCommentText(item.content) ? (
+          <CommentForm>
+            <NewCommentInput
+              placeholder="Edit this comment"
+              value={editCommentText}
+              onChangeText={(text) => setEditCommentText(text)}
+            />
+          </CommentForm>
+        ) : (
+          item.content
+        )}
+      </CommentText>
       {/* Show input for posting replies only when replyingTo matches the comment id */}
       {replyingTo === item.id ? (
         <CommentForm>
@@ -117,9 +298,50 @@ const ThreadDetails = () => {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
           />
-          <CommentButton onClick={handleAddComment}>
+          <CommentButton
+            disabled={isDisabledPostReply}
+            onClick={handleAddComment}
+          >
             <CommentButtonText>Post Reply</CommentButtonText>
           </CommentButton>
+          <CommentButton
+            disabled={isDisabledPostReply}
+            onPress={handleCancelReply}
+          >
+            <CommentButtonText>Cancel Reply</CommentButtonText>
+          </CommentButton>
+          {item.userid.toString() === userId && (
+            <>
+              {editingTo === item.id ? (
+                <>
+                  <CommentButton
+                    disabled={isDisabledEditComment}
+                    onPress={handleSubmitEditComment}
+                  >
+                    <CommentButtonText>Submit Edit</CommentButtonText>
+                  </CommentButton>
+                  <CommentButton
+                    disabled={isDisabledEditComment}
+                    onPress={handleCancelEditComment}
+                  >
+                    <CommentButtonText>Cancel Edit</CommentButtonText>
+                  </CommentButton>
+                </>
+              ) : (
+                <CommentButton onPress={() => setEditingTo(item.id)}>
+                  <CommentButtonText>Edit</CommentButtonText>
+                </CommentButton>
+              )}
+            </>
+          )}
+          {item.userid.toString() === userId && item.content !== "deleted" && (
+            <CommentButton
+              disabled={isDisabledDeleteComment}
+              onPress={() => handleDeleteComment(item)}
+            >
+              <CommentButtonText>Delete</CommentButtonText>
+            </CommentButton>
+          )}
         </CommentForm>
       ) : (
         <button onClick={() => setReplyingTo(item.id)}>
@@ -140,8 +362,56 @@ const ThreadDetails = () => {
           renderItem={renderItem}
           ListHeaderComponent={
             <>
-              <ThreadTitle>{rootThread.title}</ThreadTitle>
-              <ThreadContent>{rootThread.content}</ThreadContent>
+              <ThreadTitle>{editingTo === -1 &&
+            rootThread &&
+            setOnceEdiThreadTitle(rootThread.title) ? (
+              <CommentForm>
+                <NewCommentInput
+                  placeholder="Edit this comment"
+                  value={editThreadTitle}
+                  onChangeText={text => setEditThreadTitle(text)}
+                />
+              </CommentForm>
+            ) : (
+              rootThread && rootThread.title
+            )}</ThreadTitle>
+              <ThreadContent>
+            {editingTo === -1 &&
+            rootThread &&
+            setOnceEditCommentText(rootThread.content) ? (
+              <CommentForm>
+                <NewCommentInput
+                  placeholder="Edit this comment"
+                  value={editCommentText}
+                  onChangeText={text => setEditCommentText(text)}
+                />
+              </CommentForm>
+            ) : (
+              rootThread && rootThread.content
+            )}
+          </ThreadContent>
+          {rootThread && rootThread.userid.toString() === userId && (
+            <>
+              {editingTo === -1 ? (
+                <>
+                  <CommentButton
+                    disabled={isDisabledEditComment}
+                    onPress={handleSubmitEditThread}>
+                    <CommentButtonText>Submit Edit</CommentButtonText>
+                  </CommentButton>
+                  <CommentButton
+                    disabled={isDisabledEditComment}
+                    onPress={handleCancelEditComment}>
+                    <CommentButtonText>Cancel Edit</CommentButtonText>
+                  </CommentButton>
+                </>
+              ) : (
+                <CommentButton onPress={() => setEditingTo(-1)}>
+                  <CommentButtonText>Edit</CommentButtonText>
+                </CommentButton>
+              )}
+            </>
+          )}
             </>
           }
           ListFooterComponent={
